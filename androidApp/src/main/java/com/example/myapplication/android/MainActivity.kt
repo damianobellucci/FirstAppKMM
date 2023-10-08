@@ -7,6 +7,7 @@ import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.SystemClock
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,10 +34,15 @@ class MainActivity : ComponentActivity() {
         fun wifiScan(): MutableList<ScanResult>? {
             val wifiManager: WifiManager =
                 applicationContext.getSystemService(WIFI_SERVICE) as WifiManager;
+
             var scannedWifi = wifiManager.scanResults;
+            //scannedWifi.forEach { el -> Log.d("WiFiScan", "${el.wifiSsid}, ${(System.currentTimeMillis() - SystemClock.elapsedRealtime()) + (el.timestamp / 1000)} ");}
+            //scannedWifi.forEach { el -> Log.d("WiFiScanDebug", "${el.wifiSsid}, ${el.level} ${(SystemClock.elapsedRealtime() - (el.timestamp / 1000))}");}
+            //scannedWifi = scannedWifi.filter { el -> ((SystemClock.elapsedRealtime() - el.timestamp / 1000)) <= 10000}
+
             scannedWifi.sortBy { el-> abs(el.level) }
             //scannedWifi = scannedWifi.take(10)
-            scannedWifi.forEach { el -> Log.d("WiFiScan", "${el.wifiSsid}, ${el.level}");}
+            scannedWifi.forEach { el -> Log.d("WiFiScan", "${el.wifiSsid}, ${el.level} ${el.timestamp}");}
             return scannedWifi
         }
 
@@ -64,6 +70,23 @@ class MainActivity : ComponentActivity() {
             recyclerview.adapter = adapter
         }
 
+        fun refreshPage() {
+            updateListView(wifiScan())
+            val handler = Handler()
+            val runnable: Runnable = object : Runnable {
+                override fun run() {
+                    try {
+                        recreate()
+                    }catch (e: Exception) {}
+
+                    updateListView(wifiScan())
+                    Log.d("WiFiScan", "Iteration")
+                    handler.postDelayed(this, 10000)
+                }
+            }
+            handler.postDelayed(runnable, this.updateScanWiFiFrequency)
+        }
+
         fun checkPermissions(){
             if (ActivityCompat.checkSelfPermission(
                     this,
@@ -77,16 +100,8 @@ class MainActivity : ComponentActivity() {
                     when {
                         permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
                             Log.d("WiFiScan", "Precise location access granted.");
-                            updateListView(wifiScan())
-                            val handler = Handler()
-                            val runnable: Runnable = object : Runnable {
-                                override fun run() {
-                                    updateListView(wifiScan())
-                                    Log.d("WiFiScan", "Iteration")
-                                    handler.postDelayed(this, 10000)
-                                }
-                            }
-                            handler.postDelayed(runnable, this.updateScanWiFiFrequency)
+                            this.okPermissions = true
+                            refreshPage()
                         }
                         permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                             Log.d("WiFiScan", "Approximate location access granted.");
@@ -99,26 +114,15 @@ class MainActivity : ComponentActivity() {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION))
             }
-            else {
-                updateListView(wifiScan())
-                val handler = Handler()
-                val runnable: Runnable = object : Runnable {
-                    override fun run() {
-                        updateListView(wifiScan())
-                        Log.d("WiFiScan", "Iteration")
-                        handler.postDelayed(this, 10000)
-                    }
-                }
-                handler.postDelayed(runnable, this.updateScanWiFiFrequency)
+            else{
+                this.okPermissions = true
             }
         }
-
         checkPermissions()
-
-
+        if (this.okPermissions){
+            refreshPage()
+        }
     }
-
-
 }
 
 
