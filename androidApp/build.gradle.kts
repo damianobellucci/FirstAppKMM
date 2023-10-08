@@ -39,4 +39,8 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.2.1")
     implementation("androidx.compose.material:material:1.2.1")
     implementation("androidx.activity:activity-compose:1.5.1")
+    // for adding recyclerview
+    implementation ("androidx.recyclerview:recyclerview:1.2.0")
+    // for adding cardview
+    implementation ("androidx.cardview:cardview:1.0.0")
 }

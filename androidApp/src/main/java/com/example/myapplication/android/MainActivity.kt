@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.Greeting
 import kotlin.math.abs
 
@@ -54,16 +56,31 @@ class MainActivity : ComponentActivity() {
         scannedWifi.sortBy { el-> abs(el.level) }
         scannedWifi.reverse()
         scannedWifi.forEach { el -> Log.d("WiFiScan", "${el}");}
-        setContent {
-            MyApplicationTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    GreetingView(Greeting().greet(scannedWifi.map { el -> el.wifiSsid }))
-                }
-            }
-        }
+
+
+        ////////////////////////////////////////////////////////////
+
+        setContentView(R.layout.activity_main)
+
+        // getting the recyclerview by its id
+        val recyclerview = findViewById<RecyclerView>(R.id.recyclerview)
+
+        // this creates a vertical layout Manager
+        recyclerview.layoutManager = LinearLayoutManager(this)
+
+        // ArrayList of class ItemsViewModel
+        val data = ArrayList<ItemsViewModel>()
+
+        // This loop will create 20 Views containing
+        // the image with the count of view
+        scannedWifi.forEach { el -> data.add(ItemsViewModel(1, el.wifiSsid.toString()))}
+
+
+        // This will pass the ArrayList to our Adapter
+        val adapter = CustomAdapter(data)
+
+        // Setting the Adapter with the recyclerview
+        recyclerview.adapter = adapter
     }
 }
 

@@ -54,3 +54,10 @@ android {
         targetSdk = 33
     }
 }
+dependencies {
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    // for adding recyclerview
+    implementation ("androidx.recyclerview:recyclerview:1.2.0")
+    // for adding cardview
+    implementation ("androidx.cardview:cardview:1.0.0")
+}
