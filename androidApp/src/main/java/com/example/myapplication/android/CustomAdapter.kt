@@ -1,5 +1,6 @@
 package com.example.myapplication.android
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class CustomAdapter(private val mList: List<ItemsViewModel>) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+class CustomAdapter(private var mList: List<ItemsViewModel>) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,4 +43,11 @@ class CustomAdapter(private val mList: List<ItemsViewModel>) : RecyclerView.Adap
         val imageView: ImageView = itemView.findViewById(R.id.imageview)
         val textView: TextView = itemView.findViewById(R.id.textView)
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun update(modelList: List<ItemsViewModel>){
+        this.mList = modelList
+        this.notifyDataSetChanged()
+    }
+
 }
